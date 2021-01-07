@@ -15,5 +15,6 @@ public class LocalStore implements IRepository {
 
     @Override
     public void getOrders() {
+        //
     }
 }

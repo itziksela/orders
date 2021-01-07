@@ -12,7 +12,7 @@ class OrdersController {
     private String version = "1.0.9";
     private final static Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
-    private String dbType = "mongo";
+    private String dbType = "local";
     private IRepository storage;
 
     public OrdersController() {
