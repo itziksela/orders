@@ -7,10 +7,9 @@ import java.time.LocalDateTime;
 @RestController
 class OrdersController {
 
-    @GetMapping("/hello")
-    public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
-
-        return String.format("Hello %s! %s", name, LocalDateTime.now());
+    @GetMapping("/")
+    public String welcome(@RequestParam(value = "name", defaultValue = "World") String name) {
+        return String.format("Hello %s, welcom to Aharon & Gil successful restaurant! %s", name, LocalDateTime.now());
     }
 
     @GetMapping("/getorders")
