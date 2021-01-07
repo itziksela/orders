@@ -1,5 +1,6 @@
 package com.example.orders;
 
+import org.springframework.boot.web.client.RootUriTemplateHandler;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
@@ -20,7 +21,13 @@ class OrdersController {
 
     @GetMapping("/saveorder")
     public String saveOrder(@RequestParam String details) {
-        saveSingleOrder(details);
+        String orderId = saveSingleOrder(details);
+        return String.format("order saved %s! %s", details, orderId);
+    }
+
+    @GetMapping("/updateorder")
+    public String updateOrder(@RequestParam String id, @RequestParam String details) {
+        saveSingleOrder(id, details);
         return String.format("order saved %s! %s", details, LocalDateTime.now());
     }
 
@@ -29,10 +36,20 @@ class OrdersController {
     }
 
 
-    private void saveSingleOrder(String details) {
+    private String saveSingleOrder(String details) {
         if (details != null) {
             OrderDetails o = new OrderDetails(details);
+            return o.getId(); 
         }
+        return "nothing to save";
+    } 
+
+    private String saveSingleOrder(String id, String details) {
+        if (id != null) {
+            OrderDetails o = new OrderDetails(id, details);
+            return o.getId(); 
+        }
+        return "not exist";
     } 
 }
 
