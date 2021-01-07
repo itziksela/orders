@@ -3,13 +3,17 @@ package com.example.orders;
 import com.example.orders.repository.*;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
 @RestController
 class OrdersController {
-    private String version = "1.0.8";
+    private String version = "1.0.9";
+    private final static Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
-    private String dbType = "local";
-    private IStrategy storage;
+    private String dbType = "mongo";
+    private IRepository storage;
 
     public OrdersController() {
         if (dbType.equals("local")) {
@@ -47,5 +51,12 @@ class OrdersController {
     public String updateOrder(@RequestParam String id, @RequestParam String details) {
         storage.saveSingleOrder(id, details);
         return String.format("order saved %s! %s", details, LocalDateTime.now());
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public final Exception handleAllExceptions(RuntimeException e) {
+        LOGGER.error("Internal server error.", e);
+        return e;
     }
 }

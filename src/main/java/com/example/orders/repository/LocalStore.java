@@ -1,7 +1,7 @@
 
 package com.example.orders.repository;
 
-public class LocalStore implements IStrategy {
+public class LocalStore implements IRepository {
 
     @Override
     public String saveSingleOrder(String details) {

@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Collections;
 
-public class MondoDBStore implements IStrategy {
+public class MondoDBStore implements IRepository {
 
     @Autowired
     private OrdersRepository ordersRepository;
