@@ -1,11 +1,17 @@
 package com.example.orders;
 
 import org.springframework.boot.web.client.RootUriTemplateHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Collections;
 
 @RestController
 class OrdersController {
+
+    @Autowired
+    private OrdersRepository ordersRepository;
 
     @GetMapping("/")
     public String welcome(@RequestParam(value = "name", defaultValue = "World") String name) {
@@ -31,17 +37,19 @@ class OrdersController {
     }
 
     private void getOrders() {
-        //TO DO
+        List<OrderDetails> orders = ordersRepository.findAll();
+        Collections.reverse(orders);
     }
 
 
     private String saveSingleOrder(String details) {
         if (details != null) {
             OrderDetails o = new OrderDetails(details);
+            ordersRepository.save(o);
             return o.getId(); 
         }
         return "nothing to save";
-    } 
+    }   
 
     private String saveSingleOrder(String id, String details) {
         if (id != null) {
@@ -51,5 +59,3 @@ class OrdersController {
         return "not exist";
     } 
 }
-
-

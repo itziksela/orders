@@ -1,6 +1,12 @@
 package com.example.orders;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
+
+@Document(collection = "orders")
 class OrderDetails {
+
+    @Id
     private String id;
     private String details;
 
@@ -9,7 +15,7 @@ class OrderDetails {
     }
     public OrderDetails(String details){
         this.details = details;
-        this.id = java.util.UUID.randomUUID().toString();
+        //this.id = java.util.UUID.randomUUID().toString();
     }
 
     public OrderDetails(String id, String details){
