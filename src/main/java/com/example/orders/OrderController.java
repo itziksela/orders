@@ -1,18 +1,25 @@
 package com.example.orders;
 
-import org.springframework.boot.web.client.RootUriTemplateHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.orders.repository.*;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Collections;
 
 @RestController
 class OrdersController {
+    private String version = "1.0.8";
 
-    private String version = "1.0.5";
-    @Autowired
-    private OrdersRepository ordersRepository;
+    private String dbType = "local";
+    private IStrategy storage;
+
+    public OrdersController() {
+        if (dbType.equals("local")) {
+            storage = new LocalStore();
+        }
+        else if (dbType.equals("mongo")) {
+            storage = new MondoDBStore();
+        }
+    }
+
 
     @GetMapping("/")
     public String welcome(@RequestParam(value = "name", defaultValue = "World") String name) {
@@ -26,42 +33,19 @@ class OrdersController {
 
     @GetMapping("/getorders")
     public String getAllOrders() {
-        getOrders();
+        storage.getOrders();
         return String.format("get order %s!", LocalDateTime.now());
     }
 
     @GetMapping("/saveorder")
     public String saveOrder(@RequestParam String details) {
-        String orderId = saveSingleOrder(details);
+        String orderId = storage.saveSingleOrder(details);
         return String.format("order saved %s! %s", details, orderId);
     }
 
     @GetMapping("/updateorder")
     public String updateOrder(@RequestParam String id, @RequestParam String details) {
-        saveSingleOrder(id, details);
+        storage.saveSingleOrder(id, details);
         return String.format("order saved %s! %s", details, LocalDateTime.now());
     }
-
-    private void getOrders() {
-        List<OrderDetails> orders = ordersRepository.findAll();
-        Collections.reverse(orders);
-    }
-
-
-    private String saveSingleOrder(String details) {
-        if (details != null) {
-            OrderDetails o = new OrderDetails(details);
-            ordersRepository.save(o);
-            return o.getId(); 
-        }
-        return "nothing to save";
-    }   
-
-    private String saveSingleOrder(String id, String details) {
-        if (id != null) {
-            OrderDetails o = new OrderDetails(id, details);
-            return o.getId(); 
-        }
-        return "not exist";
-    } 
 }
