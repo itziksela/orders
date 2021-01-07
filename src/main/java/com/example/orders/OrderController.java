@@ -10,12 +10,18 @@ import java.util.Collections;
 @RestController
 class OrdersController {
 
+    private String version = "1.0.5";
     @Autowired
     private OrdersRepository ordersRepository;
 
     @GetMapping("/")
     public String welcome(@RequestParam(value = "name", defaultValue = "World") String name) {
         return String.format("Hello %s, welcom to Aharon & Gil successful restaurant! %s", name, LocalDateTime.now());
+    }
+
+    @GetMapping("/getversion")
+    public String getVersion() {
+        return String.format("Version %s", version);
     }
 
     @GetMapping("/getorders")
