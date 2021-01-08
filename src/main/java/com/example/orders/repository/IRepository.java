@@ -1,7 +1,9 @@
 package com.example.orders.repository;
 
-public interface IRepository {
+import java.util.List;
+public interface IRepository<T> {
     String saveSingleOrder(String details);
     String saveSingleOrder(String id, String details);
-    void getOrders();
+    List<T> getOrders();
+    void connect();
 }

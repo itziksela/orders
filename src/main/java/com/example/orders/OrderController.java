@@ -9,10 +9,10 @@ import org.springframework.http.HttpStatus;
 
 @RestController
 class OrdersController {
-    private String version = "1.0.9";
+    private String version = "1.0.10";
     private final static Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
-    private String dbType = "local";
+    private String dbType = "mongo";
     private IRepository storage;
 
     public OrdersController() {
@@ -24,9 +24,14 @@ class OrdersController {
         }
     }
 
-
     @GetMapping("/")
     public String welcome(@RequestParam(value = "name", defaultValue = "World") String name) {
+        try {
+            storage.connect();
+        } catch (Exception e) {
+            LOGGER.error("Internal server error.", e);
+        }
+
         return String.format("Hello %s, welcom to Aharon & Gil successful restaurant! %s", name, LocalDateTime.now());
     }
 
