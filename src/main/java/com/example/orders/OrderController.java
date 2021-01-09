@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 
 @RestController
 class OrdersController {
-    private String version = "1.0.10";
+    private String version = "1.0.11";
     private final static Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
     private String dbType = "mongo";

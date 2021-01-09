@@ -1,7 +1,6 @@
 
 package com.example.orders.repository;
 
-import com.example.orders.*;
 import com.example.orders.OrderDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
@@ -9,6 +8,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.ConnectionString;
 import java.util.ArrayList;
+import org.bson.Document;
 
 public class MondoDBStore implements IRepository<OrderDetails> {
     @Autowired
@@ -19,7 +19,7 @@ public class MondoDBStore implements IRepository<OrderDetails> {
         connect();
     }
 
-    public void connect() {
+    public void connect() {    
         StringBuilder connectionString = new StringBuilder(String.format("mongodb://%s:%d", "localhost", 27017));
         ConnectionString uri = new ConnectionString(connectionString.toString());
         MongoService service = new MongoService(uri, "orders");
@@ -32,7 +32,8 @@ public class MondoDBStore implements IRepository<OrderDetails> {
             OrderDetails o = new OrderDetails(details);
             MongoCollection<OrderDetails> collection = db.getCollection(COLLECTION_NAME, OrderDetails.class);
             collection.insertOne(o);
-            return o.getId();
+            var id = o.getId();
+            return id;
         }
         return "nothing to save";
     }

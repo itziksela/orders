@@ -5,7 +5,10 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoClient;
-
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 public class MongoService {
     private MongoClientSettings settings;
@@ -22,6 +25,7 @@ public class MongoService {
     public MongoService(ConnectionString connectionString, String database) {
         this(MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
+                .codecRegistry(fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), fromProviders(PojoCodecProvider.builder().automatic(true).build())))
                 .retryWrites(true)
                 .build(), database);
     }
@@ -38,7 +42,7 @@ public class MongoService {
     }
 
     public MongoDatabase UseDatabase(String name) {
-        this.database = this.client.getDatabase((name));
+        this.database = this.client.getDatabase((name));       
         return this.database;
     }
 
