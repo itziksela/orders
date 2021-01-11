@@ -6,32 +6,19 @@ import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import com.example.orders.dto.*;
 
 @RestController
 class OrdersController {
-    private String version = "1.0.11";
+    private String version = "1.0.20";
     private final static Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
-    private String dbType = "mongo";
-    private IRepository storage;
-
-    public OrdersController() {
-        if (dbType.equals("local")) {
-            storage = new LocalStore();
-        }
-        else if (dbType.equals("mongo")) {
-            storage = new MondoDBStore();
-        }
+    private IRepository<BaseData> getStorage() {
+        return new MongoDBStore();
     }
 
     @GetMapping("/")
     public String welcome(@RequestParam(value = "name", defaultValue = "World") String name) {
-        try {
-            storage.connect();
-        } catch (Exception e) {
-            LOGGER.error("Internal server error.", e);
-        }
-
         return String.format("Hello %s, welcom to Aharon & Gil successful restaurant! %s", name, LocalDateTime.now());
     }
 
@@ -40,21 +27,35 @@ class OrdersController {
         return String.format("Version %s", version);
     }
 
+    @GetMapping("/getinfo")
+    public String getServerName() {
+        String host = System.getenv().getOrDefault("MONGODB_SERVICE_SERVICE_HOST", "localhost");
+        String username = System.getenv().getOrDefault("MONGO_USERNAME", "");
+        String password = System.getenv().getOrDefault("MONGO_PASSWORD", "");
+        return String.format("get db %s %s/%s", host, username, password);
+    }
+
     @GetMapping("/getorders")
     public String getAllOrders() {
-        storage.getOrders();
+        var storage = getStorage();
+        storage.connect();
+        storage.getAll("OrderDetails");
         return String.format("get order %s!", LocalDateTime.now());
     }
 
     @GetMapping("/saveorder")
     public String saveOrder(@RequestParam String details) {
-        String orderId = storage.saveSingleOrder(details);
+        OrderDetails orderDetails = new OrderDetails(details);
+
+        var storage = getStorage();
+        storage.connect();
+        String orderId = storage.saveSingleItem(orderDetails);
         return String.format("order saved %s! %s", details, orderId);
     }
 
     @GetMapping("/updateorder")
     public String updateOrder(@RequestParam String id, @RequestParam String details) {
-        storage.saveSingleOrder(id, details);
+        // storage.saveSingleOrder(id, details);
         return String.format("order saved %s! %s", details, LocalDateTime.now());
     }
 

@@ -15,21 +15,31 @@ spec:
     spec:
       containers:
         - name: app
-          image: orders:1.0.1
+          image: orders:1.0.17
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
           env:
-            - name: MONGO_URL
+            - name: GREETING_PREFIX
               valueFrom:
                 configMapKeyRef:
-                  name: movie-db-config  
-                  key: database
+                  name: testconfig
+                  key: greeter          
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongo-root-username
+            - name: MONGO_PASSWORD 
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongo-root-password          
             - name: MONGO_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: mongodb-configmap
-                  key: host          
+                  name: mongodb-configmap 
+                  key: database_url
 ---
 # ... service
 apiVersion: v1
