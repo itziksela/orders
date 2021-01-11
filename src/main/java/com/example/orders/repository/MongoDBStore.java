@@ -4,14 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import com.mongodb.ConnectionString;
+
+import static com.mongodb.client.model.Updates.*;
 import java.util.ArrayList;
 import com.example.orders.data.*;
-import org.bson.Document;
+
 public class MongoDBStore<T extends BaseData> implements IRepository<T> {
     @Autowired
     private MongoDatabase db;
     private T data;
+
     public MongoDBStore(T data) {
         this.data = data;
     }
@@ -37,7 +41,8 @@ public class MongoDBStore<T extends BaseData> implements IRepository<T> {
     @Override
     public String saveSingleItem(T data) {
         if (data != null) {
-            MongoCollection<T> collection = (MongoCollection<T>) db.getCollection(data.CollectionName(), data.getClass());
+            MongoCollection<T> collection = (MongoCollection<T>) db.getCollection(data.CollectionName(),
+                    data.getClass());
             collection.insertOne(data);
             return data.getId();
         }
@@ -52,7 +57,11 @@ public class MongoDBStore<T extends BaseData> implements IRepository<T> {
 
     public List<T> getPendingOrders() {
         MongoCollection<T> collection = (MongoCollection<T>) db.getCollection(data.CollectionName(), data.getClass());
-        Document filterPending = new Document("orderStatus", OrderStatus.PENDING);
-        return collection.find(filterPending).into(new ArrayList<T>());
+        return collection.find(Filters.eq("orderStatus", OrderStatus.PENDING.toString())).into(new ArrayList<T>());
+    }
+
+    public void updateOrderStatus(String id, String status) {
+        MongoCollection<OrderDetails> collection = db.getCollection(data.CollectionName(), OrderDetails.class);
+        collection.updateOne(Filters.eq("_id", id), set("OrderStatus", OrderStatus.INPROGRESS.toString()));
     }
 }

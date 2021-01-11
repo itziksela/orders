@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 class OrdersController {
-    private String version = "1.0.22";
+    private String version = "1.0.24";
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
     private MongoDBStore<OrderDetails> getStorage() {
@@ -58,20 +58,30 @@ class OrdersController {
         return String.format("order saved %s! %s", details, orderId);
     }
 
-    @GetMapping("/updateorder")
-    public String updateOrder(@RequestParam String id, @RequestParam String details) {
-        return String.format("order saved %s! %s", details, LocalDateTime.now());
+    @GetMapping("/updateorderstatus")
+    public String updateOrderStatus(@RequestParam String id, @RequestParam String status) {
+        try {
+            var storage = getStorage();
+            storage.updateOrderStatus(id, status);
+            return "Success";
+        } catch (Exception e) {
+            return String.format("Internal server error: %s %s", e.getMessage(), e.getStackTrace());
+        }
     }
 
     @GetMapping("/getpendingorders")
     public String getPendingOrders() {
-        var storage = getStorage();
-        List<OrderDetails> orders = storage.getPendingOrders();
-        StringBuilder data = new StringBuilder("Order Details\n");
-        for (OrderDetails order : orders) {
-            data.append(String.format("order: %s%n",  order.toString()));
+        try {
+            var storage = getStorage();
+            List<OrderDetails> orders = storage.getPendingOrders();
+            StringBuilder data = new StringBuilder("Order Details\n");
+            for (OrderDetails order : orders) {
+                data.append(String.format("order: %s%n",  order.toString()));
+            }
+            return data.toString();
+        } catch (Exception e) {
+           return String.format("Internal server error: %s %s", e.getMessage(), e.getStackTrace());
         }
-        return data.toString();
     }
 
     @ExceptionHandler(RuntimeException.class)
