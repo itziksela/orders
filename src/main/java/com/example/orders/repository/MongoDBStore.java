@@ -6,15 +6,17 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.ConnectionString;
 import java.util.ArrayList;
+import com.example.orders.data.*;
 
-import com.example.orders.dto.*;
-
-public class MongoDBStore implements IRepository<BaseData> {
+public class MongoDBStore<T extends BaseData> implements IRepository<T> {
     @Autowired
     private MongoDatabase db;
+    private String collectionName;
+    private T data;
+    public MongoDBStore(T data) {
+        collectionName = data.getClass().getSimpleName();
+        this.data = data;
 
-    public MongoDBStore() {
-        connect();
     }
 
     public void connect() {
@@ -47,9 +49,8 @@ public class MongoDBStore implements IRepository<BaseData> {
     }
 
     @Override
-    public List<BaseData> getAll(String repositoryName) {
-        MongoCollection<BaseData> collection = db.getCollection(repositoryName, BaseData.class);
-        List<BaseData> o = collection.find().into(new ArrayList<BaseData>());
-        return o;
+    public <V extends BaseData> List<V> getAll() {
+        MongoCollection<V> collection = (MongoCollection<V>) db.getCollection(collectionName, data.getClass());
+        return collection.find().into(new ArrayList<V>());
     }
 }

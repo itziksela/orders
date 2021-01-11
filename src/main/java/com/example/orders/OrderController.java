@@ -6,15 +6,16 @@ import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import com.example.orders.dto.*;
+import com.example.orders.data.*;
+import java.util.List;
 
 @RestController
 class OrdersController {
     private String version = "1.0.22";
-    private final static Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
     private IRepository<BaseData> getStorage() {
-        return new MongoDBStore();
+        return new MongoDBStore(new OrderDetails());
     }
 
     @GetMapping("/")
@@ -39,8 +40,12 @@ class OrdersController {
     public String getAllOrders() {
         var storage = getStorage();
         storage.connect();
-        storage.getAll("OrderDetails");
-        return String.format("get order %s!", LocalDateTime.now());
+        List<OrderDetails> orders = storage.getAll();
+        StringBuilder data = new StringBuilder("Order Details\n");
+        for (OrderDetails order : orders) {
+            data.append(String.format("order: %s%n",  order.toString()));
+        }
+        return data.toString();
     }
 
     @GetMapping("/saveorder")
@@ -55,7 +60,6 @@ class OrdersController {
 
     @GetMapping("/updateorder")
     public String updateOrder(@RequestParam String id, @RequestParam String details) {
-        // storage.saveSingleOrder(id, details);
         return String.format("order saved %s! %s", details, LocalDateTime.now());
     }
 

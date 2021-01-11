@@ -1,13 +1,13 @@
 package com.example.orders.repository;
 
 import java.util.List;
-import com.example.orders.dto.*;
+import com.example.orders.data.*;
 
-public interface IRepository<T> {
+public interface IRepository<T extends BaseData> {
 
     String saveSingleItem(T data);
 
-    public List<BaseData> getAll(String repositoryName);
+    public <V extends BaseData> List<V> getAll();
 
     void connect();
 }

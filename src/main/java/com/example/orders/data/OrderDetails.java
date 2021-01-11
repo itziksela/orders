@@ -1,4 +1,4 @@
-package com.example.orders.dto;
+package com.example.orders.data;
 
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import java.time.LocalDate;
@@ -28,7 +28,7 @@ public class OrderDetails extends BaseData {
 
     @Override
     public String toString() {
-        return details + " " + id;
+        return String.format("%s %s, %s, %s", this.id, this.details, this.orderDate.toString(), this.orderStatus.toString());
     }
 
     public String getDetails() {
