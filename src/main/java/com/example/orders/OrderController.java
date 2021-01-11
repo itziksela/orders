@@ -10,7 +10,7 @@ import com.example.orders.dto.*;
 
 @RestController
 class OrdersController {
-    private String version = "1.0.20";
+    private String version = "1.0.22";
     private final static Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
     private IRepository<BaseData> getStorage() {

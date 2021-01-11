@@ -13,6 +13,10 @@ public class MongoDBStore implements IRepository<BaseData> {
     @Autowired
     private MongoDatabase db;
 
+    public MongoDBStore() {
+        connect();
+    }
+
     public void connect() {
 
         String host = System.getenv().getOrDefault("MONGODB_SERVICE_SERVICE_HOST", "localhost");
@@ -22,7 +26,8 @@ public class MongoDBStore implements IRepository<BaseData> {
 
         StringBuilder connectionString = new StringBuilder(String.format("mongodb://%s:%d", host, port));
         if (!host.equals("localhost")) {
-            connectionString = new StringBuilder(String.format("mongodb://%s:%s@:%s:%d", username, password, host, port));
+            connectionString = new StringBuilder(
+                    String.format("mongodb://%s:%s@%s:%d", username, password, host, port));
         }
 
         ConnectionString uri = new ConnectionString(connectionString.toString());
