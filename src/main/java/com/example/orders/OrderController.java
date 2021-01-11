@@ -14,8 +14,10 @@ class OrdersController {
     private String version = "1.0.22";
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
-    private IRepository<BaseData> getStorage() {
-        return new MongoDBStore(new OrderDetails());
+    private MongoDBStore<OrderDetails> getStorage() {
+        var storage = new MongoDBStore(new OrderDetails());
+        storage.connect();
+        return storage;
     }
 
     @GetMapping("/")
@@ -39,7 +41,6 @@ class OrdersController {
     @GetMapping("/getorders")
     public String getAllOrders() {
         var storage = getStorage();
-        storage.connect();
         List<OrderDetails> orders = storage.getAll();
         StringBuilder data = new StringBuilder("Order Details\n");
         for (OrderDetails order : orders) {
@@ -53,7 +54,6 @@ class OrdersController {
         OrderDetails orderDetails = new OrderDetails(details);
 
         var storage = getStorage();
-        storage.connect();
         String orderId = storage.saveSingleItem(orderDetails);
         return String.format("order saved %s! %s", details, orderId);
     }
@@ -61,6 +61,17 @@ class OrdersController {
     @GetMapping("/updateorder")
     public String updateOrder(@RequestParam String id, @RequestParam String details) {
         return String.format("order saved %s! %s", details, LocalDateTime.now());
+    }
+
+    @GetMapping("/getpendingorders")
+    public String getPendingOrders() {
+        var storage = getStorage();
+        List<OrderDetails> orders = storage.getPendingOrders();
+        StringBuilder data = new StringBuilder("Order Details\n");
+        for (OrderDetails order : orders) {
+            data.append(String.format("order: %s%n",  order.toString()));
+        }
+        return data.toString();
     }
 
     @ExceptionHandler(RuntimeException.class)

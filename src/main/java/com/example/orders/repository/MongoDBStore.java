@@ -7,16 +7,13 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.ConnectionString;
 import java.util.ArrayList;
 import com.example.orders.data.*;
-
+import org.bson.Document;
 public class MongoDBStore<T extends BaseData> implements IRepository<T> {
     @Autowired
     private MongoDatabase db;
-    private String collectionName;
     private T data;
     public MongoDBStore(T data) {
-        collectionName = data.getClass().getSimpleName();
         this.data = data;
-
     }
 
     public void connect() {
@@ -38,19 +35,24 @@ public class MongoDBStore<T extends BaseData> implements IRepository<T> {
     }
 
     @Override
-    public String saveSingleItem(BaseData data) {
+    public String saveSingleItem(T data) {
         if (data != null) {
-            MongoCollection<BaseData> collection = db.getCollection(data.CollectionName(), BaseData.class);
+            MongoCollection<T> collection = (MongoCollection<T>) db.getCollection(data.CollectionName(), data.getClass());
             collection.insertOne(data);
-            var id = data.getId();
-            return id;
+            return data.getId();
         }
         return "nothing to save";
     }
 
     @Override
-    public <V extends BaseData> List<V> getAll() {
-        MongoCollection<V> collection = (MongoCollection<V>) db.getCollection(collectionName, data.getClass());
-        return collection.find().into(new ArrayList<V>());
+    public List<T> getAll() {
+        MongoCollection<T> collection = (MongoCollection<T>) db.getCollection(data.CollectionName(), data.getClass());
+        return collection.find().into(new ArrayList<T>());
+    }
+
+    public List<T> getPendingOrders() {
+        MongoCollection<T> collection = (MongoCollection<T>) db.getCollection(data.CollectionName(), data.getClass());
+        Document filterPending = new Document("orderStatus", OrderStatus.PENDING);
+        return collection.find(filterPending).into(new ArrayList<T>());
     }
 }
