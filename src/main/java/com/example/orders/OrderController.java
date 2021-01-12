@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 class OrdersController {
-    private String version = "1.0.24";
+    private String version = "1.0.26";
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersController.class);
 
     private MongoDBStore<OrderDetails> getStorage() {
